@@ -1,33 +1,96 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import * as math from 'mathjs';
 import './App.css';
 import Footer from './Footer';
 
 function App() {
+
   const [input, setInput] = useState('');
-  const [result, setresult] = useState('');
-  const handleButtonClick = (value) => {
-    setInput(input + value);
-  };
+  const [result, setResult] = useState('');
   const handleClear = () => {
     setInput('');
-    setresult('');
+    setResult('');
   }
   const handleCalculate = () => {
     try {
-      const result = math.evaluate(input);
+      const result = eval(input);
       if (isNaN(result) || !isFinite(result)) {
-        setresult("Error");
-      }
-      else {
-        setresult(result.toString());
-        setInput(result.toString());
+        setResult('Error');
+      } else {
+        setResult(result.toString());
       }
     } catch (error) {
-      setresult("Error")
-
+      setResult('Error');
     }
   };
+
+  const MAX_INPUT_LENGTH = 20;
+
+  const handleButtonClick = (value) => {
+    if (input.length < MAX_INPUT_LENGTH) {
+      setInput(input + value);
+    }
+  };
+
+  const [memory, setMemory] = useState(null);
+
+  const handleMemoryAdd = () => {
+    if (input) {
+      try {
+        setMemory((prevMemory) => (prevMemory !== null ? prevMemory + parseFloat(input) : parseFloat(input)));
+      } catch (error) {
+        // Handle error
+      }
+    }
+  };
+
+  const handleMemorySubtract = () => {
+    if (input) {
+      try {
+        setMemory((prevMemory) => (prevMemory !== null ? prevMemory - parseFloat(input) : -parseFloat(input)));
+      } catch (error) {
+        // Handle error
+      }
+    }
+  };
+
+  const handleMemoryRecall = () => {
+    if (memory !== null) {
+      setInput(memory.toString());
+    }
+  };
+
+  const handleMemoryClear = () => {
+    setMemory(null);
+  };
+
+  // Add this to the App component
+  React.useEffect(() => {
+    const handleKeyDown = (event) => {
+      const key = event.key;
+      if (
+        (/[0-9]/.test(key) || ['+', '-', '*', '/', '.', 'Enter', 'Escape'].includes(key)) &&
+        !event.repeat
+      ) {
+        if (key === 'Enter') {
+          handleCalculate();
+        } else if (key === 'Escape') {
+          handleClear();
+        } else {
+          handleButtonClick(key);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleButtonClick, handleCalculate, handleClear]);
+
+  
+
   return (
     <div className="App">
       <div className='input'>
@@ -62,6 +125,12 @@ function App() {
           <button onClick={handleClear}>CLR</button>
           <button onClick={handleCalculate}>=</button>
           <button onClick={() => handleButtonClick('+')}>+</button>
+        </div>
+        <div className="row">
+          <button onClick={handleMemoryAdd}>M+</button>
+          <button onClick={handleMemorySubtract}>M-</button>
+          <button onClick={handleMemoryRecall}>MR</button>
+          <button onClick={handleMemoryClear}>MC</button>
         </div>
 
       </div>
