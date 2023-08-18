@@ -47,6 +47,22 @@
   width: 100%;
   text-align: right;
 } */
+/* src/App.css */
+.app {
+  text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.calculator-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
 
 .App {
   display: flex;
