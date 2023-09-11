@@ -1,36 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
 
 const Calculator = () => {
     const [input, setInput] = useState('');
     const [result, setResult] = useState('');
-    const handleClear = () => {
+    const [memory, setMemory] = useState(null);
+
+    const MAX_INPUT_LENGTH = 20;
+
+    const handleClear = useCallback(() => {
         setInput('');
         setResult('');
-    }
-    const handleCalculate = () => {
+    }, []);
+
+    const handleCalculate = useCallback(() => {
         try {
-            const result = eval(input);
-            if (isNaN(result) || !isFinite(result)) {
+            // Avoid using eval for security reasons
+            // You can use a library like math.js for safe expression evaluation
+            const calculatedResult = eval(input);
+            if (isNaN(calculatedResult) || !isFinite(calculatedResult)) {
                 setResult('Error');
             } else {
-                setResult(result.toString());
+                setResult(calculatedResult.toString());
             }
         } catch (error) {
             setResult('Error');
         }
-    };
+    }, [input]);
 
-    const MAX_INPUT_LENGTH = 20;
-
-    const handleButtonClick = (value) => {
+    const handleButtonClick = useCallback((value) => {
         if (input.length < MAX_INPUT_LENGTH) {
             setInput(input + value);
         }
-    };
+    }, [input]);
 
-    const [memory, setMemory] = useState(null);
-
-    const handleMemoryAdd = () => {
+    const handleMemoryAdd = useCallback(() => {
         if (input) {
             try {
                 setMemory((prevMemory) => (prevMemory !== null ? prevMemory + parseFloat(input) : parseFloat(input)));
@@ -38,9 +41,9 @@ const Calculator = () => {
                 // Handle error
             }
         }
-    };
+    }, [input]);
 
-    const handleMemorySubtract = () => {
+    const handleMemorySubtract = useCallback(() => {
         if (input) {
             try {
                 setMemory((prevMemory) => (prevMemory !== null ? prevMemory - parseFloat(input) : -parseFloat(input)));
@@ -48,90 +51,91 @@ const Calculator = () => {
                 // Handle error
             }
         }
-    };
+    }, [input]);
 
-    const handleMemoryRecall = () => {
+    const handleMemoryRecall = useCallback(() => {
         if (memory !== null) {
             setInput(memory.toString());
         }
-    };
+    }, [memory]);
 
-    const handleMemoryClear = () => {
+    const handleMemoryClear = useCallback(() => {
         setMemory(null);
-    };
+    }, []);
 
-    // Add this to the App component
-    React.useEffect(() => {
-        const handleKeyDown = (event) => {
-            const key = event.key;
-            if (
-                (/[0-9]/.test(key) || ['+', '-', '*', '/', '.', 'Enter', 'Escape'].includes(key)) &&
-                !event.repeat
-            ) {
-                if (key === 'Enter') {
-                    handleCalculate();
-                } else if (key === 'Escape') {
-                    handleClear();
-                } else {
-                    handleButtonClick(key);
-                }
+    const handleKeyDown = useCallback((event) => {
+        const key = event.key;
+        if (
+            (/[0-9]/.test(key) || ['+', '-', '*', '/', '.', 'Enter', 'Escape'].includes(key)) &&
+            !event.repeat
+        ) {
+            if (key === 'Enter') {
+                handleCalculate();
+            } else if (key === 'Escape') {
+                handleClear();
+            } else {
+                handleButtonClick(key);
             }
-        };
+        }
+    }, [handleCalculate, handleClear, handleButtonClick]);
 
+    useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [handleButtonClick, handleCalculate, handleClear]);
-
-
+    }, [handleKeyDown]);
 
     return (
         <div>
-            <div className='input'>
-                <input type='text' value={input} readOnly />
+            <div>
+                <div className='input'>
+                    <input type='text' value={input} readOnly />
+                </div>
+                <div className='result'>
+                    <span>{result !== '' ? result : '0'}</span>
+                </div>
+                <div className='buttons'>
+                    <div className='row'>
+                        {[7, 8, 9, '/'].map((value) => (
+                            <button key={value} onClick={() => handleButtonClick(value.toString())}>
+                                {value}
+                            </button>
+                        ))}
+                    </div>
+                    <div className='row'>
+                        {[4, 5, 6, '*'].map((value) => (
+                            <button key={value} onClick={() => handleButtonClick(value.toString())}>
+                                {value}
+                            </button>
+                        ))}
+                    </div>
+                    <div className='row'>
+                        {[1, 2, 3, '-', '.', 0].map((value) => (
+                            <button key={value} onClick={() => handleButtonClick(value.toString())}>
+                                {value}
+                            </button>
+                        ))}
+                        <button onClick={handleClear}>CLR</button>
+                        <button onClick={handleCalculate}>=</button>
+                        <button onClick={() => handleButtonClick('+')}>+</button>
+                    </div>
+                    <div className='row'>
+                        <button onClick={handleMemoryAdd}>M+</button>
+                        <button onClick={handleMemorySubtract}>M-</button>
+                        <button onClick={handleMemoryRecall}>MR</button>
+                        <button onClick={handleMemoryClear}>MC</button>
+                    </div>
+                </div>
             </div>
-            <div className='result'>
-                <span>{result !== '' ? result : '0'}</span>
-            </div>
-            <div className='buttons'>
-                <div className='row'>
-                    <button onClick={() => handleButtonClick('7')}>7</button>
-                    <button onClick={() => handleButtonClick('8')}>8</button>
-                    <button onClick={() => handleButtonClick('9')}>9</button>
-                    <button onClick={() => handleButtonClick('/')}>/</button>
-                </div>
-                <div className='row'>
-                    <button onClick={() => handleButtonClick('4')}>4</button>
-                    <button onClick={() => handleButtonClick('5')}>5</button>
-                    <button onClick={() => handleButtonClick('6')}>6</button>
-                    <button onClick={() => handleButtonClick('*')}>*</button>
-                </div>
-                <div className='row'>
-
-                    <button onClick={() => handleButtonClick('1')}>1</button>
-                    <button onClick={() => handleButtonClick('2')}>2</button>
-                    <button onClick={() => handleButtonClick('3')}>3</button>
-                    <button onClick={() => handleButtonClick('-')}>-</button>
-                    <button onClick={() => handleButtonClick('.')}>.</button>
-                </div>
-                <div className='row'>
-                    <button onClick={() => handleButtonClick('0')}>0</button>
-                    <button onClick={handleClear}>CLR</button>
-                    <button onClick={handleCalculate}>=</button>
-                    <button onClick={() => handleButtonClick('+')}>+</button>
-                </div>
-                <div className="row">
-                    <button onClick={handleMemoryAdd}>M+</button>
-                    <button onClick={handleMemorySubtract}>M-</button>
-                    <button onClick={handleMemoryRecall}>MR</button>
-                    <button onClick={handleMemoryClear}>MC</button>
-                </div>
-
-            </div>
+            <footer className='calculator-footer'>
+                {/* Add content for the footer */}
+                <p>created by <a href="">Abhay Tiwari</a></p>
+                <p>Calculator App &copy; 2023</p>
+            </footer>
         </div>
-    )
-}
+    );
+};
 
-export default Calculator
+export default Calculator;
