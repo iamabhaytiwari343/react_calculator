@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 
 const Calculator = () => {
-
-
     const [input, setInput] = useState('');
     const [result, setResult] = useState('');
     const handleClear = () => {
