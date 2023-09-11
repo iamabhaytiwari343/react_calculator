@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import * as math from 'mathjs';
+import React from 'react';
 import './App.css';
-import Footer from './Footer';
+// import Footer from './Footer';
 // import Scientific from './Scientific.jsx';
 import Calculator from './Calculator.jsx';
 

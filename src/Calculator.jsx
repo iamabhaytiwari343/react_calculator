@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Footer from './Footer';
+import * as math from 'mathjs';
 
 const Calculator = () => {
     const [input, setInput] = useState('');
@@ -16,7 +18,7 @@ const Calculator = () => {
         try {
             // Avoid using eval for security reasons
             // You can use a library like math.js for safe expression evaluation
-            const calculatedResult = eval(input);
+            const calculatedResult = math.evaluate(input);
             if (isNaN(calculatedResult) || !isFinite(calculatedResult)) {
                 setResult('Error');
             } else {
@@ -129,11 +131,7 @@ const Calculator = () => {
                     </div>
                 </div>
             </div>
-            <footer className='calculator-footer'>
-                {/* Add content for the footer */}
-                <p>created by <a href="">Abhay Tiwari</a></p>
-                <p>Calculator App &copy; 2023</p>
-            </footer>
+            <Footer />
         </div>
     );
 };
