@@ -34,14 +34,12 @@ const Scientific = () => {
                 <input type="text" value={input} readOnly />
             </div>
             <div className="buttons">
-                {/* Numeric and basic operation buttons */}
-                {/* ... (existing buttons) */}
+                
                 <button onClick={() => handleButtonClick('sqrt')}>√</button>
                 <button onClick={() => handleButtonClick('^')}>^</button>
                 <button onClick={() => handleButtonClick('sin')}>sin</button>
                 <button onClick={() => handleButtonClick('cos')}>cos</button>
                 <button onClick={() => handleButtonClick('tan')}>tan</button>
-                {/* ... (more scientific functions) */}
             </div>
         </div>
     );
